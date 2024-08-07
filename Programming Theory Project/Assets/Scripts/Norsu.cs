@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Norsu : Animal
 {
@@ -11,6 +12,8 @@ public class Norsu : Animal
     private void Awake()
     {
         jumpForce = 1500f;
+        sounds = new string[1];
+        sounds[0] = "Trumpet";
         if (cShake == null)
         {
             cShake = GameObject.Find("Main Camera").GetComponent<CameraShake>();
@@ -30,5 +33,14 @@ public class Norsu : Animal
                 }
                 break;
         }
+    }
+
+    public override void Talk()
+    {
+        ShowBubble(true);
+        string sound = sounds[0];
+        base.speechBubbleCanvas.transform.Find("Sound Text").GetComponent<TextMeshProUGUI>().text = sound;
+        cShake.ShakeCamera(0.1f);
+        StartCoroutine(CloseBubble());
     }
 }

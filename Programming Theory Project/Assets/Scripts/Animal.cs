@@ -1,38 +1,52 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public abstract class Animal : MonoBehaviour
 {
 
-    public string sound { get; protected set; }
+    public string[] sounds { get; protected set; }
     public float jumpForce { get; protected set; }
 
     private Rigidbody myRb;
     [SerializeField] protected bool isOnAir;
+    protected bool showBubble;
+    protected Canvas speechBubbleCanvas;
 
     // Start is called before the first frame update
     void Start()
     {
         myRb = GetComponent<Rigidbody>();
+        speechBubbleCanvas = transform.Find("Speech Bubble Canvas").GetComponent<Canvas>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public virtual void Talk()
     {
-
+        ShowBubble(true);
+        string sound = GetRandomSound();
+        speechBubbleCanvas.transform.Find("Sound Text").GetComponent<TextMeshProUGUI>().text = sound;
+        StartCoroutine(CloseBubble());
     }
 
-    public string Talk()
+    protected IEnumerator CloseBubble()
     {
-        return sound;
+        yield return new WaitForSeconds(2);
+        ShowBubble(false);
+    }
+
+    private string GetRandomSound()
+    {
+        return sounds[Random.Range(0, sounds.Length)];
     }
 
     public void Jump()
     {
-        myRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
-        isOnAir = true;
+        if (!isOnAir)
+        {
+            myRb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            isOnAir = true;
+        }
     }
 
     private void OnCollisionEnter(Collision other)
@@ -45,5 +59,10 @@ public abstract class Animal : MonoBehaviour
                 break;
 
         }
+    }
+
+    protected void ShowBubble(bool show)
+    {
+        speechBubbleCanvas.gameObject.SetActive(show);
     }
 }
